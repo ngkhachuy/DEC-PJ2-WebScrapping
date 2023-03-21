@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 import re
 
 import requests
@@ -13,28 +12,15 @@ if __name__ == '__main__':
 
     url = 'https://www.newegg.com/GPUs-Video-Graphics-Cards/SubCategory/ID-48/Page-%d?Tid=7709'
     list_product = []
-    num_of_req = 0
 
     for i in range(num_of_page):
 
         PAGE = url % (i + 1)
         # PAGE = 'https://www.newegg.com/GPUs-Video-Graphics-Cards/SubCategory/ID-48/Page-4?Tid=7709'
         print('Send request to Page %d!' % (i + 1))
-
-        err = True
-        while err:
-            res = requests.get(PAGE).text
-            num_of_req += 1
-            context = BeautifulSoup(res, 'html.parser')
-            cells = context.find_all('div', class_='item-cell')
-            # item_blocks = context.find_all('div', class_='item-container')
-            if 'Are you a human?' in context.text:
-                print("Host blocked! Wait for 15m. (Req count: %d)" % num_of_req)
-                print("Continue at: ", datetime.now() + timedelta(minutes=15))
-                num_of_req = 0
-                time.sleep(900)
-            else:
-                err = False
+        res = requests.get(PAGE).text
+        context = BeautifulSoup(res, 'html.parser')
+        cells = context.find_all('div', class_='item-cell')
 
         item_index = 0
         for item in cells:
@@ -42,7 +28,6 @@ if __name__ == '__main__':
             item_index += 1
             item_detail = item.find('a', class_='item-title')
             item_url = item_detail['href']
-            # print("Get details item: ", item_index)
 
             if item['id'].split("_")[0] == 'item':
                 type_item = 'SINGLE'
@@ -97,20 +82,6 @@ if __name__ == '__main__':
             # IMAGE's URL
             img_url = item.find('a', class_='item-img').find('img')['src']
 
-            # LOAD EACH PRODUCT FOR MORE DETAILS
-            err = True
-            while err:
-                item_res = requests.get(item_url).text
-                item_context = BeautifulSoup(item_res, 'html.parser')
-                num_of_req += 1
-                if 'Are you a human?' in context.text:
-                    print("Host blocked! Wait for 15m. (Req count: %d)" % num_of_req)
-                    print("Continue at: ", datetime.now() + timedelta(minutes=15))
-                    num_of_req = 0
-                    time.sleep(900)
-                else:
-                    err = False
-
             # Get Item features
             item_features = item.find('ul', class_='item-features').children
             max_resolution = None
@@ -152,7 +123,8 @@ if __name__ == '__main__':
             }
             list_product.append(product)
 
-    print(num_of_req)
+        print("Scanning %d products in page." % len(cells))
+
     df = pd.DataFrame(list_product)
     df.to_csv("data/items_%s.csv" % START, index=False)
     # print(df)
