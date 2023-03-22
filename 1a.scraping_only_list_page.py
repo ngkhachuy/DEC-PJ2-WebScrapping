@@ -5,6 +5,8 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
+import COMMON
+
 if __name__ == '__main__':
 
     START = datetime.now()
@@ -119,14 +121,21 @@ if __name__ == '__main__':
                 'DISPLAY_PORT': display_port,
                 'HDMI': hdmi,
                 'DIRECT_X': direct_x,
-                'MODEL': model
+                'MODEL': model,
+                'CREATED_TIME': START
             }
             list_product.append(product)
 
-        print("Scanning %d products in page." % len(cells))
+        print("Scraped %d products in page." % len(cells))
 
-    df = pd.DataFrame(list_product)
-    df.to_csv("data/items_%s.csv" % START, index=False)
-    # print(df)
-    print("TOTAL ITEMS: ", len(df), "items")
+    data = pd.DataFrame(list_product)
+    data.to_csv("data/items_%s.csv" % START, index=False)
+
+    # Store data in DB
+    COMMON.import_into_database(data)
+
+    data_feature = data.loc[:, ['ID', 'MAX_RESOLUTION', 'DISPLAY_PORT', 'HDMI', 'MODEL']]
+    data_feature.to_json("data/items_feature_%s.json" % START, orient="records")
+
+    print("TOTAL ITEMS: ", len(data), "items")
     print("EXECUTING TIME: ", datetime.now() - START)
