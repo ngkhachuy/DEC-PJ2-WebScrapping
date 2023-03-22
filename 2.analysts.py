@@ -75,5 +75,6 @@ if __name__ == '__main__':
     sns.scatterplot(rating_vs_price, x='CURRENT_PRICE', y='RATING', ax=axbig3)
     axbig3.set_title('Correlation of Rating and Price')
 
-    plt.subplots_adjust(hspace=0.3)
+    fig.suptitle('Graphic Cards from newegg.com')
+    plt.subplots_adjust(left=0.1, bottom=0.06, right=0.98, wspace=0.845, hspace=0.3)
     plt.show()
