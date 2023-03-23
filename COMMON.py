@@ -2,7 +2,7 @@ import pandas as pd
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 
-from PRODUCT import Base, PRODUCTS
+from PRODUCT import Base
 
 
 def clean_string(ip_str):
@@ -38,7 +38,7 @@ def import_into_database(data):
     session.configure(bind=engine)
     my_session = session()
 
-    data.to_sql('products', engine, if_exists='replace')
+    data.to_sql('products', engine, if_exists='replace', index=False)
 
     my_session.commit()
     my_session.close()

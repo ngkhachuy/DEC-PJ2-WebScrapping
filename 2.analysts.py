@@ -8,7 +8,6 @@ if __name__ == '__main__':
 
     # Get Data from DB
     data = COMMON.read_data_from_db()
-    data = data.astype({'RATING': float, 'COUNT_OF_RATE': int, 'CURRENT_PRICE': float, 'SHIPPING_PRICE': float})
 
     # Cleanning 'BRAND' column
     brand_list = list(data.BRAND)

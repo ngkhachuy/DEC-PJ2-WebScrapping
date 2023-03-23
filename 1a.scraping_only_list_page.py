@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     url = 'https://www.newegg.com/GPUs-Video-Graphics-Cards/SubCategory/ID-48/Page-%d?Tid=7709'
     list_product = []
+    list_item_id = []
 
     for i in range(num_of_page):
 
@@ -63,6 +64,12 @@ if __name__ == '__main__':
                 rating = 0
                 count_of_rate = 0
 
+            # Check duplicate item_id
+            if item_id in list_item_id:
+                continue
+            else:
+                list_item_id.append(item_id)
+
             # ITEM TITLE
             item_title = item_detail.text.strip().replace('\n', ' ').replace('\r', '')
 
@@ -105,15 +112,15 @@ if __name__ == '__main__':
                     model = feat_contents[1].strip().replace('\n', ' ').replace('\r', '')
 
             product = {
-                'PAGE': i + 1,
+                # 'PAGE': i + 1,
                 'ID': item_id,
                 # 'TYPE': type_item,
                 'TITLE': item_title,
                 'BRAND': item_brand,
-                'RATING': rating,
-                'COUNT_OF_RATE': count_of_rate,
-                'CURRENT_PRICE': curent_price,
-                'SHIPPING_PRICE': shipping_price,
+                'RATING': float(rating),
+                'COUNT_OF_RATE': int(count_of_rate),
+                'CURRENT_PRICE': float(curent_price),
+                'SHIPPING_PRICE': float(shipping_price),
                 'TOTAL_PRICE': float(curent_price) + float(shipping_price),
                 'IMG_URL': img_url,
                 'ITEM_URL': item_url,
@@ -125,8 +132,6 @@ if __name__ == '__main__':
                 'CREATED_TIME': START
             }
             list_product.append(product)
-
-        print("Scraped %d products in page." % len(cells))
 
     data = pd.DataFrame(list_product)
     data.to_csv("data/items_%s.csv" % START, index=False)
