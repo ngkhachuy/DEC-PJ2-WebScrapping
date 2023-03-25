@@ -2,7 +2,7 @@ import pandas as pd
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 
-from PRODUCT import Base
+from PRODUCT import Base, PRODUCTS
 
 
 def clean_string(ip_str):
@@ -31,14 +31,14 @@ def import_into_database(data):
 
     engine = db.create_engine('mysql+mysqlconnector://root:123456@localhost:3306/graphics_cards')
 
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-
     session = sessionmaker()
     session.configure(bind=engine)
     my_session = session()
 
-    data.to_sql('products', engine, if_exists='replace', index=False)
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    data.to_sql('products', engine, if_exists='append', index=False)
 
     my_session.commit()
     my_session.close()
